@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const API_URL = "https://zh.wikisource.org/w/api.php";
-const USER_AGENT = "MingliClassics/0.3 (qq250113397@proton.me)";
+const USER_AGENT = "MingliClassics/0.4 (qq250113397@proton.me)";
 
 const chineseNumbers = [
   "一",
@@ -37,6 +37,125 @@ const ditianSuiChapters = chineseNumbers.map((number, index) => {
     keywords: "天道,地道,人道,干支,阴阳,五行",
   };
 });
+
+const zhouyiHexagramNames = [
+  "乾",
+  "坤",
+  "屯",
+  "蒙",
+  "需",
+  "訟",
+  "師",
+  "比",
+  "小畜",
+  "履",
+  "泰",
+  "否",
+  "同人",
+  "大有",
+  "謙",
+  "豫",
+  "隨",
+  "蠱",
+  "臨",
+  "觀",
+  "噬嗑",
+  "賁",
+  "剝",
+  "復",
+  "无妄",
+  "大畜",
+  "頤",
+  "大過",
+  "坎",
+  "離",
+  "咸",
+  "恒",
+  "遯",
+  "大壯",
+  "晉",
+  "明夷",
+  "家人",
+  "睽",
+  "蹇",
+  "解",
+  "損",
+  "益",
+  "夬",
+  "姤",
+  "萃",
+  "升",
+  "困",
+  "井",
+  "革",
+  "鼎",
+  "震",
+  "艮",
+  "漸",
+  "歸妹",
+  "豐",
+  "旅",
+  "巽",
+  "兌",
+  "渙",
+  "節",
+  "中孚",
+  "小過",
+  "既濟",
+  "未濟",
+];
+
+const zhouyiHexagrams = zhouyiHexagramNames.map((name, index) => {
+  const number = String(index + 1).padStart(2, "0");
+  return {
+    page: `周易/${name}`,
+    file: `yixue/zhouyi-${number}.md`,
+    title: "周易",
+    chapter: `第${index + 1}卦·${name}`,
+    category: "易学卜筮",
+    keywords: `周易,易经,六十四卦,${name},卦辞,爻辞`,
+  };
+});
+
+const zhouyiCommentaries = [
+  ["周易/彖", "彖传", "彖辞"],
+  ["周易/大象", "大象传", "大象"],
+  ["周易/小象", "小象传", "小象"],
+  ["周易/文言", "文言传", "文言"],
+  ["易傳/繫辭上", "系辞上传", "系辞"],
+  ["易傳/繫辭下", "系辞下传", "系辞"],
+  ["易傳/說卦", "说卦传", "说卦"],
+  ["易傳/序卦", "序卦传", "序卦"],
+  ["易傳/雜卦", "杂卦传", "杂卦"],
+].map(([page, chapter, keyword], index) => ({
+  page,
+  file: `yixue/zhouyi-commentary-${String(index + 1).padStart(2, "0")}.md`,
+  title: "周易",
+  chapter,
+  category: "易学卜筮",
+  keywords: `周易,易传,十翼,${keyword}`,
+}));
+
+const zengshanChapterIds = [
+  "序",
+  ...Array.from({ length: 26 }, (_, index) => String(index + 1)),
+  "15又",
+  "26又1",
+  "26又2",
+  "26又3",
+  "26又4",
+];
+
+const zengshanChapters = zengshanChapterIds.map((id) => ({
+  page: `增刪卜易/${id}`,
+  file: `yixue/zengshan-buyi-${id === "序" ? "xu" : id}.md`,
+  title: "增删卜易",
+  chapter: id === "序" ? "序" : `第${id}章`,
+  category: "易学卜筮",
+  keywords: "六爻,用神,世应,月建,日辰,占卜",
+  // The first chapter is an intentionally short mnemonic table.
+  minimumLength: id === "1" ? 30 : undefined,
+}));
 
 const pages = [
   {
@@ -113,27 +232,31 @@ const pages = [
     category: "易学卜筮",
     keywords: "八卦,体用,外应,占验,梅花",
   },
+  ...zhouyiHexagrams,
+  ...zhouyiCommentaries,
+  ...zengshanChapters,
   {
-    page: "增刪卜易/3",
-    file: "yixue/zengshan-buyi-3.md",
-    title: "增删卜易",
-    chapter: "卷三",
+    page: "卜筮正宗（河潞武子龄校本）/卷前",
+    file: "yixue/bushi-zhengzong-juanqian.md",
+    title: "卜筮正宗",
+    chapter: "卷前",
     category: "易学卜筮",
-    keywords: "六爻,用神,世应,月建,日辰",
+    keywords: "六爻,卜筮,八卦,天干,地支,五行",
   },
 ];
 
 function stripWikiMarkup(wikitext) {
   return wikitext
     .replace(/\{\{Textquality[^}]*\}\}\s*/gi, "")
-    .replace(/\{\{Header2?[\s\S]*?\}\}\s*/gi, "")
-    .replace(/\{\{header[\s\S]*?\}\}\s*/gi, "")
+    .replace(/^\{\{Header2?\b[\s\S]*?^\}\}\s*/gim, "")
     .replace(/<\/?onlyinclude>/gi, "")
     .replace(/<poem[^>]*>/gi, "")
     .replace(/<\/poem>/gi, "")
     .replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "")
     .replace(/<ref[^/>]*\/>/gi, "")
     .replace(/\{\|[\s\S]*?\|\}/g, "")
+    .replace(/\[\[(?:File|Image):[^\]]+\]\]/gi, "")
+    .replace(/^(?:\*+#?|[:;]+)\s*/gm, "")
     .replace(/^=====\s*(.*?)\s*=====$/gm, "##### $1")
     .replace(/^====\s*(.*?)\s*====$/gm, "#### $1")
     .replace(/^===\s*(.*?)\s*===$/gm, "### $1")
@@ -141,12 +264,17 @@ function stripWikiMarkup(wikitext) {
     .replace(/^=\s*(.*?)\s*=$/gm, "# $1")
     .replace(/\[\[[^|\]]+\|([^\]]+)\]\]/g, "$1")
     .replace(/\[\[([^\]]+)\]\]/g, "$1")
+    .replace(/\[https?:\/\/[^\s\]]+\s+([^\]]+)\]/g, "$1")
+    .replace(/-\{T\|[^}]+\}-\s*/g, "")
+    .replace(/-\{([^}]+)\}-/g, "$1")
     .replace(/\{\{[^{}|]*\|(?:[^{}|]*\|)*([^{}|]+)\}\}/g, "$1")
     .replace(/\{\{[^{}]+\}\}/g, "")
     .replace(/<[^>]+>/g, "")
-    .replace(/'''([^']+)'''/g, "**$1**")
-    .replace(/''([^']+)''/g, "*$1*")
-    .replace(/^[*:;]+\s?/gm, "")
+    .replace(/'''([^'\n]+)\n'''/g, "**$1**\n")
+    .replace(/'''([^'\n]+)'''/g, "**$1**")
+    .replace(/''([^'\n]+)''/g, "*$1*")
+    .replace(/'{2,}/g, "")
+    .replace(/^Category:.*$/gim, "")
     .replace(/^notes=.*$/gm, "")
     .replace(/^\d+%\s*$/gm, "")
     .replace(/__TOC__/gi, "")
@@ -184,20 +312,34 @@ async function fetchWikitext(pageTitle) {
     format: "json",
     formatversion: "2",
   });
-  const response = await fetch(`${API_URL}?${params}`, {
-    headers: { "User-Agent": USER_AGENT },
-  });
 
-  if (!response.ok) {
-    throw new Error(`Wikisource returned HTTP ${response.status} for ${pageTitle}`);
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(`${API_URL}?${params}`, {
+        headers: { "User-Agent": USER_AGENT },
+        signal: AbortSignal.timeout(30_000),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `Wikisource returned HTTP ${response.status} for ${pageTitle}`,
+        );
+      }
+
+      const payload = await response.json();
+      const wikitext = payload?.parse?.wikitext;
+      if (typeof wikitext !== "string") {
+        throw new Error(`No wikitext returned for ${pageTitle}`);
+      }
+      return wikitext;
+    } catch (error) {
+      if (attempt === 3) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1_000));
+      console.warn(`Retrying ${pageTitle} after attempt ${attempt}`);
+    }
   }
 
-  const payload = await response.json();
-  const wikitext = payload?.parse?.wikitext;
-  if (typeof wikitext !== "string") {
-    throw new Error(`No wikitext returned for ${pageTitle}`);
-  }
-  return wikitext;
+  throw new Error(`Unable to import ${pageTitle}`);
 }
 
 for (const item of pages) {
