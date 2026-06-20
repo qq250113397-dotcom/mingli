@@ -13,7 +13,10 @@ describe("App", () => {
     const chart = screen.getByRole("region", { name: "紫微斗数命盘" });
     expect(within(chart).getAllByRole("button")).toHaveLength(12);
     expect(screen.getByText("大限")).toBeInTheDocument();
+    expect(screen.getByText("小限")).toBeInTheDocument();
     expect(screen.getByText("流年")).toBeInTheDocument();
+    expect(screen.getByText("流月")).toBeInTheDocument();
+    expect(screen.getByText("流日")).toBeInTheDocument();
     expect(screen.getByText("古籍原文")).toBeInTheDocument();
   });
 
@@ -37,14 +40,14 @@ describe("App", () => {
     expect(screen.queryByText(/文本来源：维基文库/)).not.toBeInTheDocument();
   });
 
-  it("keeps the birth form year in sync with the fortune controls", async () => {
+  it("keeps the target date in sync with the fortune year controls", async () => {
     const user = userEvent.setup();
     render(<App />);
 
     await user.click(screen.getByRole("button", { name: "查看下一年" }));
 
-    expect(screen.getByRole("spinbutton", { name: "查看流年" })).toHaveValue(
-      2027,
+    expect(screen.getByLabelText("查看日期")).toHaveValue(
+      "2027-06-20",
     );
   });
 
@@ -61,5 +64,23 @@ describe("App", () => {
     expect(
       screen.queryByRole("dialog", { name: "这张命盘怎么算" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("applies and remembers an algorithm profile", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "打开算法设置" }));
+    await user.selectOptions(screen.getByLabelText("安星法"), "zhongzhou");
+    await user.click(
+      screen.getByRole("button", { name: "应用并重新排盘" }),
+    );
+
+    expect(
+      screen.queryByRole("dialog", { name: "这张命盘怎么算" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "打开算法设置" }));
+    expect(screen.getByLabelText("安星法")).toHaveValue("zhongzhou");
   });
 });

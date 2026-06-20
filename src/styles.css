@@ -625,28 +625,24 @@ select:focus-visible {
   font-weight: 500;
 }
 
-.chart-center dl,
-.settings-dialog dl {
+.chart-center dl {
   display: grid;
   gap: 0.55rem;
   margin: 0;
 }
 
-.chart-center dl > div,
-.settings-dialog dl > div {
+.chart-center dl > div {
   display: grid;
   grid-template-columns: 5.5rem 1fr;
   gap: 0.75rem;
 }
 
-.chart-center dt,
-.settings-dialog dt {
+.chart-center dt {
   color: var(--muted);
   font-size: 0.7rem;
 }
 
-.chart-center dd,
-.settings-dialog dd {
+.chart-center dd {
   margin: 0;
   font-family: "Noto Serif SC", serif;
   font-size: 0.78rem;
@@ -755,7 +751,7 @@ select:focus-visible {
 
 .fortune-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-top: 1rem;
   border-bottom: 1px solid var(--line);
 }
@@ -766,6 +762,7 @@ select:focus-visible {
   border: 0;
   background: transparent;
   font-family: "Noto Serif SC", serif;
+  font-size: 0.75rem;
   cursor: pointer;
 }
 
@@ -979,10 +976,46 @@ select:focus-visible {
   font-size: 1.25rem;
 }
 
-.settings-dialog dl {
+.settings-dialog__engine {
+  margin: -0.75rem 0 1.25rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.settings-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
   padding: 1rem 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+}
+
+.settings-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.settings-field span {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.settings-field select {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fbf8f1;
+  color: var(--ink);
+}
+
+.settings-dialog__hint {
+  margin: 0.75rem 0 0;
+  color: var(--faint);
+  font-size: 0.68rem;
+  line-height: 1.6;
 }
 
 .settings-dialog .primary-action {
@@ -1103,6 +1136,10 @@ select:focus-visible {
   }
 
   .birth-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-fields {
     grid-template-columns: 1fr;
   }
 
