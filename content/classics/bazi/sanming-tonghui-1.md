@@ -5,7 +5,7 @@ category: 四柱命理
 source: https://zh.wikisource.org/wiki/%E4%B8%89%E5%91%BD%E9%80%9A%E6%9C%83/%E5%8D%B7%E4%B8%80
 license: CC BY-SA 4.0
 status: 维基文库版本，待逐字校勘
-keywords: 干支,五行,纳音,四柱,命理
+keywords: 干支,五行,纳音,四柱,命理,格局
 ---
 
 > 文本来源：维基文库。原始古籍属于公有领域；本数字文本依维基文库 CC BY-SA 4.0 条款署名与同方式共享。

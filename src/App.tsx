@@ -8,7 +8,9 @@ import { ClassicPanel } from "./components/ClassicPanel";
 import { FortunePanel } from "./components/FortunePanel";
 import { LibrarySidebar } from "./components/LibrarySidebar";
 import {
+  DEFAULT_ALGORITHM_OPTIONS,
   buildChart,
+  type AlgorithmOptions,
   type BirthInput,
   type ChartPalace,
 } from "./domain/chart";
@@ -27,14 +29,22 @@ const DEFAULT_BIRTH: BirthInput = {
   isLeapMonth: false,
   fixLeap: true,
 };
+const DEFAULT_TARGET_DATE = "2026-06-20";
 const DEFAULT_QUERY = "紫微";
 const DEFAULT_DOCUMENT =
   searchClassics(CLASSIC_DOCUMENTS, DEFAULT_QUERY)[0].document;
 
 export function App() {
   const [birth, setBirth] = useState(DEFAULT_BIRTH);
-  const [year, setYear] = useState(2026);
-  const [chart, setChart] = useState(() => buildChart(DEFAULT_BIRTH, 2026));
+  const [targetDate, setTargetDate] = useState(DEFAULT_TARGET_DATE);
+  const [algorithm, setAlgorithm] = useState(DEFAULT_ALGORITHM_OPTIONS);
+  const [chart, setChart] = useState(() =>
+    buildChart(
+      DEFAULT_BIRTH,
+      DEFAULT_TARGET_DATE,
+      DEFAULT_ALGORITHM_OPTIONS,
+    ),
+  );
   const [selectedPalace, setSelectedPalace] = useState(7);
   const [query, setQuery] = useState(DEFAULT_QUERY);
   const [selectedDocument, setSelectedDocument] = useState(DEFAULT_DOCUMENT);
@@ -60,11 +70,19 @@ export function App() {
     if (nextResult) selectDocument(nextResult.document);
   }
 
-  function updateChart(nextBirth: BirthInput, nextYear: number) {
+  function updateChart(
+    nextBirth: BirthInput,
+    nextTargetDate: string,
+    nextAlgorithm: AlgorithmOptions = algorithm,
+  ) {
     try {
-      const nextChart = buildChart(nextBirth, nextYear);
+      const nextChart = buildChart(
+        nextBirth,
+        nextTargetDate,
+        nextAlgorithm,
+      );
       setBirth(nextBirth);
-      setYear(nextYear);
+      setTargetDate(nextChart.fortune.date);
       setChart(nextChart);
       setError("");
     } catch (chartError) {
@@ -82,7 +100,14 @@ export function App() {
   }
 
   function changeYear(nextYear: number) {
-    updateChart(birth, nextYear);
+    const [, month, day] = chart.fortune.date.split("-");
+    updateChart(birth, `${nextYear}-${month}-${day}`);
+  }
+
+  function applyAlgorithm(nextAlgorithm: AlgorithmOptions) {
+    updateChart(birth, targetDate, nextAlgorithm);
+    setAlgorithm(nextAlgorithm);
+    setSettingsOpen(false);
   }
 
   function focusClassicSearch() {
@@ -112,9 +137,9 @@ export function App() {
 
         <main className="chart-workspace">
           <BirthForm
-            key={year}
+            key={targetDate}
             initialBirth={birth}
-            initialYear={year}
+            initialTargetDate={targetDate}
             onSubmit={updateChart}
           />
           {error && <p role="alert">{error}</p>}
@@ -173,7 +198,11 @@ export function App() {
         />
       )}
       {isSettingsOpen && (
-        <AlgorithmDialog onClose={() => setSettingsOpen(false)} />
+        <AlgorithmDialog
+          options={algorithm}
+          onApply={applyAlgorithm}
+          onClose={() => setSettingsOpen(false)}
+        />
       )}
     </div>
   );

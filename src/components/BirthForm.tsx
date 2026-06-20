@@ -4,17 +4,17 @@ import { TIME_OPTIONS, type BirthInput, type Gender } from "../domain/chart";
 
 interface BirthFormProps {
   initialBirth: BirthInput;
-  initialYear: number;
-  onSubmit: (birth: BirthInput, year: number) => void;
+  initialTargetDate: string;
+  onSubmit: (birth: BirthInput, targetDate: string) => void;
 }
 
 export function BirthForm({
   initialBirth,
-  initialYear,
+  initialTargetDate,
   onSubmit,
 }: BirthFormProps) {
   const [birth, setBirth] = useState(initialBirth);
-  const [year, setYear] = useState(initialYear);
+  const [targetDate, setTargetDate] = useState(initialTargetDate);
 
   function updateBirth<Key extends keyof BirthInput>(
     key: Key,
@@ -25,7 +25,7 @@ export function BirthForm({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onSubmit(birth, year);
+    onSubmit(birth, targetDate);
   }
 
   function selectGender(gender: Gender) {
@@ -107,13 +107,13 @@ export function BirthForm({
         </label>
 
         <label className="field">
-          <span>查看流年</span>
+          <span>查看日期</span>
           <input
-            type="number"
-            min="1900"
-            max="2100"
-            value={year}
-            onChange={(event) => setYear(Number(event.target.value))}
+            type="date"
+            min="1900-01-01"
+            max="2100-12-31"
+            value={targetDate}
+            onChange={(event) => setTargetDate(event.target.value)}
             required
           />
         </label>

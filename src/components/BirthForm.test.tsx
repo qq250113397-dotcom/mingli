@@ -21,7 +21,7 @@ describe("BirthForm", () => {
     render(
       <BirthForm
         initialBirth={initialBirth}
-        initialYear={2026}
+        initialTargetDate="2026-06-20"
         onSubmit={onSubmit}
       />,
     );
@@ -31,8 +31,27 @@ describe("BirthForm", () => {
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({ gender: "女", date: "1990-05-20" }),
-      2026,
+      "2026-06-20",
     );
+  });
+
+  it("submits the selected fortune date", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+
+    render(
+      <BirthForm
+        initialBirth={initialBirth}
+        initialTargetDate="2026-06-20"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await user.clear(screen.getByLabelText("查看日期"));
+    await user.type(screen.getByLabelText("查看日期"), "2026-10-01");
+    await user.click(screen.getByRole("button", { name: "开始排盘" }));
+
+    expect(onSubmit).toHaveBeenCalledWith(initialBirth, "2026-10-01");
   });
 
   it("shows the leap-month option only for lunar input", async () => {
@@ -41,7 +60,7 @@ describe("BirthForm", () => {
     render(
       <BirthForm
         initialBirth={initialBirth}
-        initialYear={2026}
+        initialTargetDate="2026-06-20"
         onSubmit={vi.fn()}
       />,
     );

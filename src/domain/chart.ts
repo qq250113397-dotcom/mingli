@@ -3,6 +3,22 @@ import { astro } from "iztro";
 export type CalendarType = "solar" | "lunar";
 export type Gender = "男" | "女";
 
+export interface AlgorithmOptions {
+  algorithm: "default" | "zhongzhou";
+  yearDivide: "normal" | "exact";
+  horoscopeDivide: "normal" | "exact";
+  ageDivide: "normal" | "birthday";
+  dayDivide: "current" | "forward";
+}
+
+export const DEFAULT_ALGORITHM_OPTIONS: AlgorithmOptions = {
+  algorithm: "default",
+  yearDivide: "normal",
+  horoscopeDivide: "normal",
+  ageDivide: "normal",
+  dayDivide: "forward",
+};
+
 export interface BirthInput {
   calendar: CalendarType;
   date: string;
@@ -33,6 +49,7 @@ export interface ChartPalace {
 
 export interface FortuneItem {
   index: number;
+  name: string;
   heavenlyStem: string;
   earthlyBranch: string;
   palaceNames: string[];
@@ -41,6 +58,7 @@ export interface FortuneItem {
 }
 
 export interface ChartViewModel {
+  algorithm: AlgorithmOptions;
   summary: {
     gender: string;
     solarDate: string;
@@ -58,11 +76,16 @@ export interface ChartViewModel {
   };
   palaces: ChartPalace[];
   fortune: {
+    date: string;
+    lunarDate: string;
     year: number;
     nominalAge: number;
     decadalRange: [number, number];
     decadal: FortuneItem;
+    age: FortuneItem;
     yearly: FortuneItem;
+    monthly: FortuneItem;
+    daily: FortuneItem;
   };
 }
 
@@ -82,17 +105,44 @@ export const TIME_OPTIONS = [
   { value: 12, label: "晚子时（23:00–00:00）" },
 ] as const;
 
-function validateInput(input: BirthInput, targetYear: number) {
-  if (!Number.isInteger(input.timeIndex) || input.timeIndex < 0 || input.timeIndex > 12) {
+function normalizeTargetDate(target: string | number): string {
+  const rawDate = typeof target === "number" ? `${target}-6-20` : target;
+  const match = rawDate.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+  if (!match) {
+    throw new Error("查看日期格式不正确，请重新选择年月日。");
+  }
+
+  const [, rawYear, rawMonth, rawDay] = match;
+  const year = Number(rawYear);
+  const month = Number(rawMonth);
+  const day = Number(rawDay);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const isValidDate =
+    year >= 1900 &&
+    year <= 2100 &&
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day;
+
+  if (!isValidDate) {
+    throw new Error("查看日期暂时支持 1900 至 2100 年，请检查年月日。");
+  }
+
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function validateInput(input: BirthInput) {
+  if (
+    !Number.isInteger(input.timeIndex) ||
+    input.timeIndex < 0 ||
+    input.timeIndex > 12
+  ) {
     throw new Error("出生时辰需要从早子时到晚子时中选择。");
   }
 
   if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(input.date)) {
     throw new Error("出生日期格式不正确，请重新选择年月日。");
-  }
-
-  if (!Number.isInteger(targetYear) || targetYear < 1900 || targetYear > 2100) {
-    throw new Error("流年年份暂时支持 1900 至 2100 年。");
   }
 }
 
@@ -112,6 +162,7 @@ function mapStars(
 
 function mapFortuneItem(item: {
   index: number;
+  name: string;
   heavenlyStem: string;
   earthlyBranch: string;
   palaceNames: string[];
@@ -120,6 +171,7 @@ function mapFortuneItem(item: {
 }): FortuneItem {
   return {
     index: item.index,
+    name: item.name,
     heavenlyStem: item.heavenlyStem,
     earthlyBranch: item.earthlyBranch,
     palaceNames: [...item.palaceNames],
@@ -132,29 +184,29 @@ function mapFortuneItem(item: {
 
 export function buildChart(
   input: BirthInput,
-  targetYear: number,
+  target: string | number,
+  algorithm: AlgorithmOptions = DEFAULT_ALGORITHM_OPTIONS,
 ): ChartViewModel {
-  validateInput(input, targetYear);
+  validateInput(input);
+  const targetDate = normalizeTargetDate(target);
 
   try {
-    const astrolabe =
-      input.calendar === "solar"
-        ? astro.bySolar(input.date, input.timeIndex, input.gender, input.fixLeap, "zh-CN")
-        : astro.byLunar(
-            input.date,
-            input.timeIndex,
-            input.gender,
-            input.isLeapMonth,
-            input.fixLeap,
-            "zh-CN",
-          );
-
-    // Mid-year avoids mixing the previous and selected lunar year at the boundary.
-    const horoscope = astrolabe.horoscope(`${targetYear}-6-20`);
+    const astrolabe = astro.withOptions({
+      type: input.calendar,
+      dateStr: input.date,
+      timeIndex: input.timeIndex,
+      gender: input.gender,
+      isLeapMonth: input.isLeapMonth,
+      fixLeap: input.fixLeap,
+      language: "zh-CN",
+      config: algorithm,
+    });
+    const horoscope = astrolabe.horoscope(targetDate);
     const decadalRange =
       astrolabe.palaces[horoscope.decadal.index]?.decadal.range ?? [0, 0];
 
     return {
+      algorithm: { ...algorithm },
       summary: {
         gender: astrolabe.gender,
         solarDate: astrolabe.solarDate,
@@ -183,11 +235,16 @@ export function buildChart(
         decadalRange: [...palace.decadal.range],
       })),
       fortune: {
-        year: targetYear,
+        date: targetDate,
+        lunarDate: horoscope.lunarDate,
+        year: Number(targetDate.slice(0, 4)),
         nominalAge: horoscope.age.nominalAge,
         decadalRange: [...decadalRange],
         decadal: mapFortuneItem(horoscope.decadal),
+        age: mapFortuneItem(horoscope.age),
         yearly: mapFortuneItem(horoscope.yearly),
+        monthly: mapFortuneItem(horoscope.monthly),
+        daily: mapFortuneItem(horoscope.daily),
       },
     };
   } catch (error) {

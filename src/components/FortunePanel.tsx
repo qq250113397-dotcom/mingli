@@ -6,6 +6,16 @@ import {
 import { useState } from "react";
 import type { ChartViewModel, FortuneItem } from "../domain/chart";
 
+type FortuneScope = "decadal" | "age" | "yearly" | "monthly" | "daily";
+
+const FORTUNE_TABS: Array<{ scope: FortuneScope; label: string }> = [
+  { scope: "decadal", label: "大限" },
+  { scope: "age", label: "小限" },
+  { scope: "yearly", label: "流年" },
+  { scope: "monthly", label: "流月" },
+  { scope: "daily", label: "流日" },
+];
+
 interface FortunePanelProps {
   chart: ChartViewModel;
   onYearChange: (year: number) => void;
@@ -45,9 +55,23 @@ export function FortunePanel({
   onYearChange,
   onKeywordSelect,
 }: FortunePanelProps) {
-  const [activeTab, setActiveTab] = useState<"decadal" | "yearly">("decadal");
-  const item =
-    activeTab === "decadal" ? chart.fortune.decadal : chart.fortune.yearly;
+  const [activeTab, setActiveTab] = useState<FortuneScope>("decadal");
+  const item = chart.fortune[activeTab];
+  const activeLabel =
+    FORTUNE_TABS.find((tab) => tab.scope === activeTab)?.label ?? item.name;
+
+  function cardTitle() {
+    if (activeTab === "decadal") {
+      return `${chart.fortune.decadalRange[0]}–${chart.fortune.decadalRange[1]} 岁`;
+    }
+    if (activeTab === "age") {
+      return `虚岁 ${chart.fortune.nominalAge}`;
+    }
+    if (activeTab === "yearly") {
+      return `${chart.fortune.year} 年`;
+    }
+    return `${item.heavenlyStem}${item.earthlyBranch} · ${chart.fortune.lunarDate}`;
+  }
 
   return (
     <section className="fortune-panel panel-section" id="fortune">
@@ -55,7 +79,7 @@ export function FortunePanel({
         <div>
           <span className="section-kicker">当前查看</span>
           <h2>
-            {chart.fortune.year} 年 · 虚岁 {chart.fortune.nominalAge}
+            {chart.fortune.date} · 虚岁 {chart.fortune.nominalAge}
           </h2>
         </div>
         <RiCalendarEventLine aria-hidden="true" />
@@ -80,33 +104,23 @@ export function FortunePanel({
       </div>
 
       <div className="fortune-tabs" role="tablist" aria-label="运限类型">
-        <button
-          className={activeTab === "decadal" ? "is-active" : ""}
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "decadal"}
-          onClick={() => setActiveTab("decadal")}
-        >
-          大限
-        </button>
-        <button
-          className={activeTab === "yearly" ? "is-active" : ""}
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "yearly"}
-          onClick={() => setActiveTab("yearly")}
-        >
-          流年
-        </button>
+        {FORTUNE_TABS.map((tab) => (
+          <button
+            className={activeTab === tab.scope ? "is-active" : ""}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.scope}
+            onClick={() => setActiveTab(tab.scope)}
+            key={tab.scope}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      <div className="fortune-card">
-        <span>{activeTab === "decadal" ? "十年区间" : "年度信息"}</span>
-        <h3>
-          {activeTab === "decadal"
-            ? `${chart.fortune.decadalRange[0]}–${chart.fortune.decadalRange[1]} 岁`
-            : `${chart.fortune.year} 年`}
-        </h3>
+      <div className="fortune-card" role="tabpanel">
+        <span>{activeLabel}信息</span>
+        <h3>{cardTitle()}</h3>
         <FortuneDetails item={item} onKeywordSelect={onKeywordSelect} />
       </div>
       <p className="panel-hint">点击四化词，可在下方古籍中查找原文。</p>
