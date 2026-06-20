@@ -7,6 +7,7 @@ import { BirthForm } from "./components/BirthForm";
 import { ClassicPanel } from "./components/ClassicPanel";
 import { FortunePanel } from "./components/FortunePanel";
 import { LibrarySidebar } from "./components/LibrarySidebar";
+import { ShenshaPanel } from "./components/ShenshaPanel";
 import {
   DEFAULT_ALGORITHM_OPTIONS,
   buildChart,
@@ -64,10 +65,17 @@ export function App() {
     setLibraryOpen(false);
   }
 
-  function updateQuery(nextQuery: string) {
+  function updateQuery(nextQuery: string, preferredDocumentId?: string) {
     setQuery(nextQuery);
-    const nextResult = searchClassics(CLASSIC_DOCUMENTS, nextQuery)[0];
-    if (nextResult) selectDocument(nextResult.document);
+    const preferredDocument = preferredDocumentId
+      ? CLASSIC_DOCUMENTS.find(
+          (document) => document.id === preferredDocumentId,
+        )
+      : undefined;
+    const nextDocument =
+      preferredDocument ??
+      searchClassics(CLASSIC_DOCUMENTS, nextQuery)[0]?.document;
+    if (nextDocument) selectDocument(nextDocument);
   }
 
   function updateChart(
@@ -168,10 +176,17 @@ export function App() {
           </section>
         </main>
 
-        <aside className="insight-sidebar" aria-label="运限和古籍原文">
+        <aside
+          className="insight-sidebar"
+          aria-label="运限、神煞和古籍原文"
+        >
           <FortunePanel
             chart={chart}
             onYearChange={changeYear}
+            onKeywordSelect={updateQuery}
+          />
+          <ShenshaPanel
+            chineseDate={chart.summary.chineseDate}
             onKeywordSelect={updateQuery}
           />
           <ClassicPanel

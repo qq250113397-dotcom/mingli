@@ -17,6 +17,9 @@ describe("App", () => {
     expect(screen.getByText("流年")).toBeInTheDocument();
     expect(screen.getByText("流月")).toBeInTheDocument();
     expect(screen.getByText("流日")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "四柱神煞" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("古籍原文")).toBeInTheDocument();
   });
 
@@ -29,6 +32,20 @@ describe("App", () => {
     expect(screen.getByRole("searchbox", { name: "搜索古籍" })).toHaveValue(
       "财帛",
     );
+  });
+
+  it("uses a shensha hit to search its classical source", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /天乙贵人/ }));
+
+    expect(screen.getByRole("searchbox", { name: "搜索古籍" })).toHaveValue(
+      "天乙贵人",
+    );
+    expect(
+      screen.getByRole("heading", { name: /三命通会/ }),
+    ).toBeInTheDocument();
   });
 
   it("opens a classical text that matches the default search", () => {

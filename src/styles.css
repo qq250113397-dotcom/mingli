@@ -835,6 +835,104 @@ select:focus-visible {
   font-size: 0.66rem;
 }
 
+.shensha-summary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  background: #fbf8f1;
+  font-size: 0.7rem;
+}
+
+.shensha-summary span,
+.shensha-summary small {
+  color: var(--muted);
+}
+
+.shensha-summary strong {
+  color: var(--cinnabar);
+  font-weight: 500;
+}
+
+.shensha-summary small {
+  grid-column: 1 / -1;
+}
+
+.shensha-list {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.shensha-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.shensha-item {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.5rem;
+}
+
+.shensha-item > button {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.shensha-item > button:hover strong,
+.shensha-item > button:focus-visible strong {
+  color: var(--cinnabar);
+}
+
+.shensha-item > button strong {
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.shensha-item > button span {
+  color: var(--muted);
+  font-size: 0.66rem;
+  text-align: right;
+}
+
+.shensha-item > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.shensha-item small {
+  color: var(--faint);
+  font-size: 0.61rem;
+  line-height: 1.5;
+}
+
+.shensha-item a {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--cinnabar);
+  font-size: 0.61rem;
+}
+
+.shensha-item a svg {
+  width: 0.72rem;
+}
+
 .classic-search {
   margin-top: 1rem;
 }
