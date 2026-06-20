@@ -58,13 +58,14 @@ npm run content:sync
 
 ## 部署
 
-网站部署到 Cloudflare Pages，构建产物为 `dist/`：
+正式域名使用 Cloudflare Workers 静态资源部署，Cloudflare Pages 地址作为备用。两种方式都使用同一份 `dist/` 构建产物：
 
 ```bash
 npm run deploy
+npm run deploy:pages
 ```
 
-Cloudflare 配置见 `wrangler.jsonc`，安全响应头见 `public/_headers`。
+正式域名配置见 `wrangler.worker.jsonc`，Pages 配置见 `wrangler.jsonc`，安全响应头见 `public/_headers`。
 
 ## 授权
 
