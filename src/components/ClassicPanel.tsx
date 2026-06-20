@@ -14,8 +14,11 @@ interface ClassicPanelProps {
 
 function readableBody(document: ClassicDocument) {
   return document.body
+    .replace(/^>\s*文本来源：.*$/gm, "")
+    .replace(/__TOC__/g, "")
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/\n{3,}/g, "\n\n")
+    .trim()
     .slice(0, 520);
 }
 

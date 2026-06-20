@@ -848,6 +848,11 @@ select:focus-visible {
   margin: 0.75rem 0;
   padding-bottom: 0.25rem;
   overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.result-strip::-webkit-scrollbar {
+  display: none;
 }
 
 .result-strip button {

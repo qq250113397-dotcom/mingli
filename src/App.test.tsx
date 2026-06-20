@@ -27,4 +27,13 @@ describe("App", () => {
       "财帛",
     );
   });
+
+  it("opens a classical text that matches the default search", () => {
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { name: "紫微斗数全书 · 卷三" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/文本来源：维基文库/)).not.toBeInTheDocument();
+  });
 });

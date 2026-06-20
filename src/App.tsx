@@ -27,16 +27,17 @@ const DEFAULT_BIRTH: BirthInput = {
   isLeapMonth: false,
   fixLeap: true,
 };
+const DEFAULT_QUERY = "紫微";
+const DEFAULT_DOCUMENT =
+  searchClassics(CLASSIC_DOCUMENTS, DEFAULT_QUERY)[0].document;
 
 export function App() {
   const [birth, setBirth] = useState(DEFAULT_BIRTH);
   const [year, setYear] = useState(2026);
   const [chart, setChart] = useState(() => buildChart(DEFAULT_BIRTH, 2026));
   const [selectedPalace, setSelectedPalace] = useState(7);
-  const [query, setQuery] = useState("紫微");
-  const [selectedDocument, setSelectedDocument] = useState(
-    CLASSIC_DOCUMENTS[0],
-  );
+  const [query, setQuery] = useState(DEFAULT_QUERY);
+  const [selectedDocument, setSelectedDocument] = useState(DEFAULT_DOCUMENT);
   const [activeCategory, setActiveCategory] =
     useState<ClassicCategory>("紫微斗数");
   const [isLibraryOpen, setLibraryOpen] = useState(false);
