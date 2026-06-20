@@ -97,11 +97,11 @@ export function buildChart(
 
 ## Success Criteria
 
-- [ ] 输入查看日期后，能得到大限、小限、流年、流月、流日数据。
-- [ ] 算法设置可切换并重新排盘，默认配置与 iztro 2.5.8 一致。
-- [ ] 古籍文档不少于 25 个，全部通过来源和正文校验。
-- [ ] 页面显示实际收录卷数，并可搜索新增正文。
-- [ ] `npm test`、`npm run lint`、`npm run build` 全部通过。
+- [x] 输入查看日期后，能得到大限、小限、流年、流月、流日数据。
+- [x] 算法设置可切换并重新排盘，默认配置与 iztro 2.5.8 一致。
+- [x] 古籍文档不少于 25 个，全部通过来源和正文校验。
+- [x] 页面显示实际收录卷数，并可搜索新增正文。
+- [x] `npm test`、`npm run lint`、`npm run build` 全部通过。
 - [ ] PR 审查合并后部署到 `https://mingli.lbenben.cc.cd`。
 - [ ] Obsidian 中有二期来源、算法和发布记录。
 
