@@ -112,7 +112,8 @@ export function App() {
 
         <main className="chart-workspace">
           <BirthForm
-            initialBirth={DEFAULT_BIRTH}
+            key={year}
+            initialBirth={birth}
             initialYear={year}
             onSubmit={updateChart}
           />

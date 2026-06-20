@@ -1,6 +1,38 @@
 import { RiCloseLine } from "@remixicon/react";
+import { useEffect, useRef, type KeyboardEvent } from "react";
 
 export function AlgorithmDialog({ onClose }: { onClose: () => void }) {
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      onClose();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const controls = Array.from(
+      event.currentTarget.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => !element.hasAttribute("disabled"));
+    const firstControl = controls[0];
+    const lastControl = controls[controls.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstControl) {
+      event.preventDefault();
+      lastControl?.focus();
+    } else if (!event.shiftKey && document.activeElement === lastControl) {
+      event.preventDefault();
+      firstControl?.focus();
+    }
+  }
+
   return (
     <div className="dialog-backdrop" role="presentation" onMouseDown={onClose}>
       <section
@@ -9,8 +41,10 @@ export function AlgorithmDialog({ onClose }: { onClose: () => void }) {
         aria-modal="true"
         aria-labelledby="settings-title"
         onMouseDown={(event) => event.stopPropagation()}
+        onKeyDown={handleKeyDown}
       >
         <button
+          ref={closeButtonRef}
           className="icon-button settings-dialog__close"
           type="button"
           aria-label="关闭算法说明"

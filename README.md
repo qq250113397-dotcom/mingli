@@ -66,6 +66,10 @@ npm run deploy
 
 Cloudflare 配置见 `wrangler.jsonc`，安全响应头见 `public/_headers`。
 
+## 授权
+
+程序代码采用 MIT License；古籍数字文本的许可和来源见 [NOTICE.md](NOTICE.md) 及每个 Markdown 文件的 Frontmatter。
+
 ## 说明
 
 本项目用于传统文化研究与娱乐，不提供确定性人生判断，不替代医疗、法律、投资等专业意见。不同紫微斗数流派的四化、星曜亮度和闰月规则可能不同，页面会明确当前算法口径。
