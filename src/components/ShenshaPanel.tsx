@@ -71,6 +71,22 @@ export function ShenshaPanel({
                     <RiExternalLinkLine aria-hidden="true" />
                   </a>
                 </div>
+                <details className="shensha-commentary">
+                  <summary>展开大师讲解</summary>
+                  <section aria-label={`${hit.name}大师讲解`}>
+                    <h4>{hit.commentary.title}</h4>
+                    <p>{hit.commentary.hitReading}</p>
+                    <p>
+                      <strong>古法本意：</strong>
+                      {hit.commentary.classicMeaning}
+                    </p>
+                    <p>
+                      <strong>落到现实：</strong>
+                      {hit.commentary.practicalReading}
+                    </p>
+                    <small>{hit.commentary.caution}</small>
+                  </section>
+                </details>
               </article>
             ))}
           </section>
