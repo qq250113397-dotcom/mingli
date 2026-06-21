@@ -6,6 +6,7 @@ import { AstrolabeGrid } from "./components/AstrolabeGrid";
 import { BirthForm } from "./components/BirthForm";
 import { ClassicPanel } from "./components/ClassicPanel";
 import { FortunePanel } from "./components/FortunePanel";
+import { FortuneTimeline } from "./components/FortuneTimeline";
 import { LibrarySidebar } from "./components/LibrarySidebar";
 import { ShenshaPanel } from "./components/ShenshaPanel";
 import {
@@ -15,6 +16,10 @@ import {
   type BirthInput,
   type ChartPalace,
 } from "./domain/chart";
+import {
+  buildDecadalTimeline,
+  createAnnualReading,
+} from "./domain/annual-reading";
 import { CLASSIC_DOCUMENTS } from "./lib/classic-content";
 import {
   searchClassics,
@@ -58,6 +63,11 @@ export function App() {
     () => searchClassics(CLASSIC_DOCUMENTS, query),
     [query],
   );
+  const decadalTimeline = useMemo(
+    () => buildDecadalTimeline(birth, targetDate, algorithm),
+    [birth, targetDate, algorithm],
+  );
+  const annualReading = useMemo(() => createAnnualReading(chart), [chart]);
 
   function selectDocument(document: ClassicDocument) {
     setSelectedDocument(document);
@@ -155,6 +165,12 @@ export function App() {
             chart={chart}
             selectedPalace={selectedPalace}
             onSelectPalace={selectPalace}
+          />
+          <FortuneTimeline
+            timeline={decadalTimeline}
+            selectedYear={chart.fortune.year}
+            reading={annualReading}
+            onYearChange={changeYear}
           />
           <section className="privacy-callout" id="about">
             <RiShieldCheckLine aria-hidden="true" />
