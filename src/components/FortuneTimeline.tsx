@@ -58,7 +58,7 @@ export function FortuneTimeline({
         <div className="annual-commentary__title">
           <RiBookOpenLine aria-hidden="true" />
           <div>
-            <span>规则化解读 · 可查看依据</span>
+            <span>盘面直断 · 点名星曜与四化</span>
             <h3>{reading.title}</h3>
           </div>
         </div>

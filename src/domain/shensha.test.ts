@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { calculateShensha } from "./shensha";
+import {
+  SUPPORTED_SHENSHA_NAMES,
+  calculateShensha,
+  getShenshaCommentary,
+} from "./shensha";
 
 describe("calculateShensha", () => {
   it("finds the expanded classic-sourced shensha in the default four pillars", () => {
@@ -123,6 +127,28 @@ describe("calculateShensha", () => {
       expect(hit.source.documentId).toMatch(/^bazi\//);
       expect(hit.basis.length).toBeGreaterThan(0);
     }
+  });
+
+  it("provides a distinct master-style explanation for every supported shensha", () => {
+    expect(SUPPORTED_SHENSHA_NAMES).toHaveLength(67);
+
+    for (const name of SUPPORTED_SHENSHA_NAMES) {
+      const commentary = getShenshaCommentary(name);
+
+      expect(commentary.title).toContain(name);
+      expect(commentary.classicMeaning.length).toBeGreaterThan(12);
+      expect(commentary.practicalReading.length).toBeGreaterThan(12);
+      expect(commentary.caution.length).toBeGreaterThan(8);
+    }
+  });
+
+  it("explains a hit together with its actual matching pillar", () => {
+    const result = calculateShensha("庚午 辛巳 乙酉 甲申", "男");
+    const hit = result.hits.find((item) => item.name === "天乙贵人");
+
+    expect(hit?.commentary.title).toBe("天乙贵人怎么讲");
+    expect(hit?.commentary.hitReading).toContain("落在时柱·申");
+    expect(hit?.commentary.hitReading).toContain("日干乙");
   });
 
   it("rejects malformed four pillars", () => {

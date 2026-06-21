@@ -67,8 +67,10 @@ describe("FortuneTimeline", () => {
     expect(
       screen.getByRole("heading", { name: /大师批注/ }),
     ).toBeInTheDocument();
-    expect(screen.getByText("年度主轴")).toBeInTheDocument();
-    expect(screen.getByText("需要留意")).toBeInTheDocument();
+    expect(screen.getByText("十年气候")).toBeInTheDocument();
+    expect(screen.getByText("四化怎么走")).toBeInTheDocument();
+    expect(screen.getByText("卡点在哪")).toBeInTheDocument();
+    expect(screen.getByText("落地判断")).toBeInTheDocument();
     expect(screen.getByText(/传统文化研究与娱乐/)).toBeInTheDocument();
   });
 });

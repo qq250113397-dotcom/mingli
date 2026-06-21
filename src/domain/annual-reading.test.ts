@@ -49,18 +49,39 @@ describe("createAnnualReading", () => {
   it("turns the annual palace and four transformations into traceable notes", () => {
     const chart = buildChart(birth, "2026-06-20");
     const reading = createAnnualReading(chart);
+    const yearlyPalace = chart.palaces[chart.fortune.yearly.index];
+    const namedStar = yearlyPalace.majorStars[0]?.name;
 
     expect(reading.title).toContain("2026");
-    expect(reading.sections.map((section) => section.label)).toEqual([
-      "年度主轴",
-      "机会窗口",
-      "需要留意",
-      "行动建议",
-    ]);
+    expect(reading.sections).toHaveLength(5);
+    expect(reading.sections.map((section) => section.label)).toEqual(
+      expect.arrayContaining(["十年气候", "今年落点", "四化怎么走", "落地判断"]),
+    );
+    expect(reading.summary).toContain("不是只看一个流年宫");
+    if (namedStar) {
+      expect(
+        reading.sections.some((section) => section.body.includes(namedStar)),
+      ).toBe(true);
+    }
+    for (const mutagen of chart.fortune.yearly.mutagens) {
+      expect(
+        reading.sections.some((section) => section.body.includes(mutagen)),
+      ).toBe(true);
+    }
     expect(reading.evidence).toHaveLength(6);
     expect(reading.evidence.map((item) => item.label)).toEqual(
       expect.arrayContaining(["大限命宫", "流年命宫", "化禄", "化忌"]),
     );
+  });
+
+  it("explains the interaction instead of repeating generic palace templates", () => {
+    const reading = createAnnualReading(buildChart(birth, "2027-06-20"));
+    const copy = reading.sections.map((section) => section.body).join("");
+
+    expect(copy).toMatch(/大限.*流年/);
+    expect(copy).toMatch(/化禄.*化权.*化科/);
+    expect(copy).toMatch(/化忌/);
+    expect(copy).not.toContain("把年度目标压缩成三件可执行的小事");
   });
 
   it("does not present traditional interpretation as a guaranteed outcome", () => {

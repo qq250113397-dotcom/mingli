@@ -56,6 +56,7 @@ export interface ShenshaHit {
   matches: string[];
   basis: string[];
   source: ShenshaSource;
+  commentary: ShenshaCommentary;
 }
 
 export interface ShenshaResult {
@@ -71,76 +72,6 @@ const SANMING_VOLUME_3 =
   "https://zh.wikisource.org/wiki/三命通會/卷三";
 const YUANHAI_ZIPING = "https://zh.wikisource.org/wiki/淵海子平";
 const WUXING_JINGJI = "https://zh.wikisource.org/wiki/五行精紀";
-
-const SUPPORTED_RULES = [
-  "天乙贵人",
-  "文昌贵",
-  "禄神",
-  "阳刃",
-  "金舆",
-  "太极贵人",
-  "文星贵",
-  "天印贵",
-  "学堂",
-  "词馆",
-  "红艳煞",
-  "飞刃",
-  "驿马",
-  "咸池",
-  "将星",
-  "华盖",
-  "劫煞",
-  "亡神",
-  "灾煞",
-  "六厄",
-  "攀鞍",
-  "旬空",
-  "截路空亡",
-  "五鬼空亡",
-  "克害空亡",
-  "破祖空亡",
-  "天德贵人",
-  "月德贵人",
-  "天德合",
-  "月德合",
-  "德秀贵人",
-  "月空",
-  "月厌",
-  "月煞",
-  "天赦",
-  "旌德",
-  "旌钺",
-  "三奇贵人",
-  "元辰",
-  "勾神",
-  "绞神",
-  "孤辰",
-  "寡宿",
-  "天罗",
-  "地网",
-  "暗金煞",
-  "官符",
-  "病符",
-  "死符",
-  "丧门",
-  "吊客",
-  "十恶大败",
-  "四废",
-  "八专",
-  "九丑",
-  "孤鸾寡鹊",
-  "阴阳差错",
-  "日贵",
-  "日德",
-  "魁罡",
-  "金神",
-  "自刃",
-  "破煞",
-  "自缢煞",
-  "天屠煞",
-  "挂剑煞",
-  "阴阳煞",
-] as const;
 
 const DAY_STEM_BRANCH_RULES: Array<{
   name: string;
@@ -600,12 +531,18 @@ function findMixedMatches(
 
 function addHit(
   hits: ShenshaHit[],
-  hit: Omit<ShenshaHit, "targetValues"> & { targetValues?: string[] },
+  hit: Omit<ShenshaHit, "targetValues" | "commentary"> & {
+    targetValues?: string[];
+  },
 ) {
   if (hit.matches.length === 0) {
     return;
   }
-  hits.push({ ...hit, targetValues: hit.targetValues ?? [] });
+  hits.push({
+    ...hit,
+    targetValues: hit.targetValues ?? [],
+    commentary: getShenshaCommentary(hit.name, hit.matches, hit.basis),
+  });
 }
 
 function findThreeHarmonyTarget(
@@ -1336,6 +1273,13 @@ export function calculateShensha(
     pillars,
     hits,
     voidBranches,
-    checkedRuleCount: SUPPORTED_RULES.length,
+    checkedRuleCount: SUPPORTED_SHENSHA_NAMES.length,
   };
 }
+import {
+  SUPPORTED_SHENSHA_NAMES,
+  getShenshaCommentary,
+  type ShenshaCommentary,
+} from "./shensha-commentary";
+
+export { SUPPORTED_SHENSHA_NAMES, getShenshaCommentary };

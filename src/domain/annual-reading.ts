@@ -26,7 +26,12 @@ export interface AnnualReading {
   title: string;
   summary: string;
   sections: Array<{
-    label: "年度主轴" | "机会窗口" | "需要留意" | "行动建议";
+    label:
+      | "十年气候"
+      | "今年落点"
+      | "四化怎么走"
+      | "卡点在哪"
+      | "落地判断";
     body: string;
   }>;
   evidence: Array<{
@@ -37,6 +42,23 @@ export interface AnnualReading {
 }
 
 const TRANSFORMATION_LABELS = ["化禄", "化权", "化科", "化忌"] as const;
+
+const STAR_CHARACTER: Record<string, string> = {
+  紫微: "重主导、格局与责任，事情往往要由自己定方向",
+  天机: "重变化、策划与信息，越需要边走边调整",
+  太阳: "重公开、担当与付出，容易被看见也容易多承担",
+  武曲: "重执行、财务与结果，适合用数字和成果说话",
+  天同: "重感受、协调与生活品质，但也要防止求安逸",
+  廉贞: "重边界、欲望与规则，选择越多越要守住原则",
+  天府: "重资源、稳定与统筹，适合经营已有基础",
+  太阴: "重积累、内在判断与细节，宜稳中求进",
+  贪狼: "重机会、人脉与体验，能开局也要防止分心",
+  巨门: "重口舌、分析与质疑，成败常在怎么说、证据够不够",
+  天相: "重合作、规范与辅助，借平台和制度更容易成事",
+  天梁: "重原则、照顾与化解，容易承担收拾局面的角色",
+  七杀: "重突破、压力与决断，适合攻坚但不宜鲁莽",
+  破军: "重更新、拆旧与重建，变化不是点缀而是主课题",
+};
 
 const PALACE_GUIDANCE: Record<
   string,
@@ -155,6 +177,55 @@ function findStarPalace(chart: ChartViewModel, starName: string): string {
   return palace?.name ?? "宫位待核";
 }
 
+function palaceStars(
+  chart: ChartViewModel,
+  index: number,
+  includeYearlyStars = false,
+): string[] {
+  const palace = chart.palaces[index];
+  const major = palace?.majorStars.map((star) =>
+    star.brightness ? `${star.name}（${star.brightness}）` : star.name,
+  );
+  const yearly = includeYearlyStars
+    ? chart.fortune.yearly.starsByPalace[index] ?? []
+    : [];
+
+  return [...new Set([...(major ?? []), ...yearly])].slice(0, 5);
+}
+
+function starReading(stars: string[]): string {
+  const mainStars = stars
+    .map((star) => star.replace(/（.*$/, ""))
+    .filter((star) => STAR_CHARACTER[star])
+    .slice(0, 2);
+
+  if (mainStars.length === 0) {
+    return "本宫没有十四主星直接坐守，判断不能只抓一个星名，要结合对宫和四化落点来看";
+  }
+
+  return mainStars
+    .map((star) => `${star}${STAR_CHARACTER[star]}`)
+    .join("；");
+}
+
+function transformationLine(
+  label: (typeof TRANSFORMATION_LABELS)[number],
+  star: string | undefined,
+  chart: ChartViewModel,
+): string {
+  if (!star) return `${label}星曜待核`;
+
+  const palace = findStarPalace(chart, star);
+  const meaning = {
+    化禄: "是资源、人情和机会较容易流入的地方",
+    化权: "是要拿主意、扛责任，也最容易感到忙和硬的地方",
+    化科: "是靠专业、名声、文书或解释能力获得认可的地方",
+    化忌: "是最容易反复、执着或出现沟通成本的地方",
+  }[label];
+
+  return `${label}${star}落${palace}，${meaning}`;
+}
+
 export function buildDecadalTimeline(
   birth: BirthInput,
   targetDate: string,
@@ -209,33 +280,46 @@ export function createAnnualReading(
     chart.fortune.decadal.index,
   );
   const guidance = PALACE_GUIDANCE[yearlyPalace] ?? PALACE_GUIDANCE.命宫;
+  const yearlyStars = palaceStars(chart, chart.fortune.yearly.index, true);
+  const decadalStars = palaceStars(chart, chart.fortune.decadal.index);
   const transformations = chart.fortune.yearly.mutagens.map(
     (star, index) => ({
       label: TRANSFORMATION_LABELS[index],
       value: `${star} · ${findStarPalace(chart, star)}`,
     }),
   );
-  const restriction = transformations[3];
+  const transformationLines = TRANSFORMATION_LABELS.map((label, index) =>
+    transformationLine(label, chart.fortune.yearly.mutagens[index], chart),
+  );
+  const yearlyStarNames =
+    yearlyStars.length > 0 ? yearlyStars.join("、") : "本宫无十四主星";
+  const decadalStarNames =
+    decadalStars.length > 0 ? decadalStars.join("、") : "本宫无十四主星";
+  const samePalace = decadalPalace === yearlyPalace;
 
   return {
     title: `${chart.fortune.year} 年大师批注`,
-    summary: `大限走${decadalPalace}，流年走${yearlyPalace}。这一年先看“${guidance.theme}”。`,
+    summary: `看这一年，不是只看一个流年宫。你这步大限落${decadalPalace}，流年命宫走到${yearlyPalace}，再把${TRANSFORMATION_LABELS.map((label, index) => `${label}${chart.fortune.yearly.mutagens[index] ?? "待核"}`).join("、")}串起来，重点才会清楚。`,
     sections: [
       {
-        label: "年度主轴",
-        body: `${guidance.theme}。大限${decadalPalace}提供十年背景，流年${yearlyPalace}决定当年的观察重点。`,
+        label: "十年气候",
+        body: `大限在${decadalPalace}，宫内见${decadalStarNames}。这十年先处理的是${PALACE_GUIDANCE[decadalPalace]?.theme ?? "个人方向与资源安排"}；${starReading(decadalStars)}。所以本年发生的事，最终都会回到这条十年主线上。`,
       },
       {
-        label: "机会窗口",
-        body: `${guidance.opportunity}。${transformations[0]?.value ?? "化禄位置待核"}可作为资源较容易聚集之处观察。`,
+        label: "今年落点",
+        body: `流年命宫落${yearlyPalace}，见${yearlyStarNames}。${starReading(yearlyStars)}。${samePalace ? "流年与大限落在同一宫，十年课题在这一年会被明显放大，不能再用拖延绕过去。" : `大限管${decadalPalace}，流年转到${yearlyPalace}，今年要用${yearlyPalace}的事情去回应${decadalPalace}的长期课题。`}`,
       },
       {
-        label: "需要留意",
-        body: `${guidance.caution}。${restriction?.value ?? "化忌位置待核"}只表示课题较集中，不代表会发生坏事。`,
+        label: "四化怎么走",
+        body: `${transformationLines.slice(0, 3).join("；")}。简单说：先看化禄从哪里进资源，再看化权在哪里必须亲自推动，最后用化科把事情做得可被信任。`,
       },
       {
-        label: "行动建议",
-        body: guidance.action,
+        label: "卡点在哪",
+        body: `${transformationLines[3]}。化忌不代表坏事会发生，而是这个宫位最容易让人重复用力、想不开或说不清；${guidance.caution}。先处理卡点，化禄、化权、化科才接得住。`,
+      },
+      {
+        label: "落地判断",
+        body: `这一年可做的不是等运来，而是顺着盘面用力：${guidance.opportunity}；具体先做“${guidance.action}”。凡涉及健康、投资、合同或法律问题，盘面只提示关注方向，最后以专业意见和现实证据为准。`,
       },
     ],
     evidence: [

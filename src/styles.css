@@ -1159,6 +1159,49 @@ select:focus-visible {
   width: 0.72rem;
 }
 
+.shensha-commentary {
+  margin-top: 0.75rem;
+  border-left: 3px solid var(--cinnabar);
+  background: color-mix(in srgb, var(--paper) 88%, var(--cinnabar) 12%);
+}
+
+.shensha-commentary summary {
+  padding: 0.65rem 0.875rem;
+  color: var(--cinnabar-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shensha-commentary > section {
+  padding: 0 1rem 0.875rem;
+}
+
+.shensha-commentary h4 {
+  margin: 0 0 0.5rem;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+
+.shensha-commentary p {
+  margin: 0.35rem 0;
+  color: var(--ink);
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.shensha-commentary p strong {
+  color: var(--ink);
+}
+
+.shensha-commentary section > small {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
 .classic-search {
   margin-top: 1rem;
 }

@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { ShenshaPanel } from "./ShenshaPanel";
 
 describe("ShenshaPanel", () => {
-  it("renders source-labelled hits for the current four pillars", () => {
+  it("renders source-labelled hits and expandable master commentary", async () => {
+    const user = userEvent.setup();
     render(
       <ShenshaPanel
         chineseDate="庚午 辛巳 乙酉 甲申"
@@ -25,6 +26,13 @@ describe("ShenshaPanel", () => {
       "href",
       expect.stringContaining("三命通會"),
     );
+    await user.click(screen.getAllByText("展开大师讲解")[0]);
+    expect(
+      screen.getByRole("heading", { name: "天乙贵人怎么讲" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("这张盘的天乙贵人落在时柱·申，查法是：日干乙查子、申。"),
+    ).toBeInTheDocument();
   });
 
   it("uses a shensha name to search the classical collection", async () => {
