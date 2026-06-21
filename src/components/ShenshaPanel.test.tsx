@@ -8,6 +8,7 @@ describe("ShenshaPanel", () => {
     render(
       <ShenshaPanel
         chineseDate="庚午 辛巳 乙酉 甲申"
+        gender="男"
         onKeywordSelect={() => undefined}
       />,
     );
@@ -15,7 +16,8 @@ describe("ShenshaPanel", () => {
     expect(
       screen.getByRole("heading", { name: "四柱神煞" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("11 项规则")).toBeInTheDocument();
+    expect(screen.getByText("67 项规则")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "贵人与文教" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /天乙贵人/ })).toHaveTextContent(
       "时柱·申",
     );
@@ -31,6 +33,7 @@ describe("ShenshaPanel", () => {
     render(
       <ShenshaPanel
         chineseDate="庚午 辛巳 乙酉 甲申"
+        gender="男"
         onKeywordSelect={onKeywordSelect}
       />,
     );

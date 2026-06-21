@@ -1,16 +1,26 @@
 import { RiCompass3Line, RiExternalLinkLine } from "@remixicon/react";
-import { calculateShensha } from "../domain/shensha";
+import {
+  SHENSHA_CATEGORY_ORDER,
+  calculateShensha,
+  type ShenshaGender,
+} from "../domain/shensha";
 
 interface ShenshaPanelProps {
   chineseDate: string;
+  gender: ShenshaGender;
   onKeywordSelect: (keyword: string, documentId: string) => void;
 }
 
 export function ShenshaPanel({
   chineseDate,
+  gender,
   onKeywordSelect,
 }: ShenshaPanelProps) {
-  const result = calculateShensha(chineseDate);
+  const result = calculateShensha(chineseDate, gender);
+  const groupedHits = SHENSHA_CATEGORY_ORDER.map((category) => ({
+    category,
+    hits: result.hits.filter((hit) => hit.category === category),
+  })).filter((group) => group.hits.length > 0);
 
   return (
     <section
@@ -33,37 +43,42 @@ export function ShenshaPanel({
 
       <div className="shensha-list" aria-label="神煞命中结果">
         {result.hits.length === 0 && (
-          <p className="shensha-empty">本次四柱在首批规则中没有直接命中。</p>
+          <p className="shensha-empty">本次四柱在已核验规则中没有直接命中。</p>
         )}
-        {result.hits.map((hit) => (
-          <article className="shensha-item" key={hit.name}>
-            <button
-              type="button"
-              onClick={() =>
-                onKeywordSelect(hit.name, hit.source.documentId)
-              }
-            >
-              <strong>{hit.name}</strong>
-              <span>{hit.matches.join("、")}</span>
-            </button>
-            <div>
-              <small>{hit.basis.join("；")}</small>
-              <a
-                href={hit.source.url}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`核验${hit.name}出处：${hit.source.title}${hit.source.chapter}`}
-              >
-                {hit.source.title} · {hit.source.chapter}
-                <RiExternalLinkLine aria-hidden="true" />
-              </a>
-            </div>
-          </article>
+        {groupedHits.map((group) => (
+          <section className="shensha-group" key={group.category}>
+            <h3>{group.category}</h3>
+            {group.hits.map((hit) => (
+              <article className="shensha-item" key={hit.name}>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onKeywordSelect(hit.name, hit.source.documentId)
+                  }
+                >
+                  <strong>{hit.name}</strong>
+                  <span>{hit.matches.join("、")}</span>
+                </button>
+                <div>
+                  <small>{hit.basis.join("；")}</small>
+                  <a
+                    href={hit.source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`核验${hit.name}出处：${hit.source.title}${hit.source.chapter}`}
+                  >
+                    {hit.source.title} · {hit.source.chapter}
+                    <RiExternalLinkLine aria-hidden="true" />
+                  </a>
+                </div>
+              </article>
+            ))}
+          </section>
         ))}
       </div>
 
       <p className="panel-hint">
-        神煞只作辅助标记，不能脱离五行旺衰与整体格局单独断事。点击名称可查古籍原文。
+        已尽量收录现有四柱可复算的典籍规则；需要胎元、命宫、纳音复合判断的条目不冒充支持。神煞不能脱离整体格局单独断事。
       </p>
     </section>
   );
