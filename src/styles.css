@@ -705,6 +705,212 @@ select:focus-visible {
   border-left: 1px solid var(--line);
 }
 
+.fortune-visual {
+  margin-top: 1rem;
+  border: 1px solid var(--line-dark);
+  background: var(--paper);
+}
+
+.fortune-visual__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.fortune-visual__heading h2 {
+  margin: 0.2rem 0 0;
+  font-family: "Noto Serif SC", serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.fortune-visual__heading p {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.fortune-visual__heading svg {
+  width: 1.35rem;
+  color: var(--cinnabar);
+}
+
+.fortune-ruler {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(5.25rem, 1fr));
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.fortune-ruler button {
+  position: relative;
+  min-height: 7.25rem;
+  padding: 0.7rem 0.45rem;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: #fbf8f1;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.fortune-ruler button:last-child {
+  border-right: 0;
+}
+
+.fortune-ruler button:hover,
+.fortune-ruler button:focus-visible {
+  background: #f4eee1;
+}
+
+.fortune-ruler button.is-selected {
+  background: #3d3730;
+  color: #fffaf0;
+}
+
+.fortune-ruler button.is-selected::after {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0;
+  left: 0.5rem;
+  height: 3px;
+  background: var(--cinnabar);
+  content: "";
+}
+
+.fortune-ruler span,
+.fortune-ruler strong,
+.fortune-ruler small,
+.fortune-ruler em {
+  display: block;
+}
+
+.fortune-ruler span {
+  font-size: 0.68rem;
+}
+
+.fortune-ruler strong {
+  margin-top: 0.45rem;
+  font-family: "Noto Serif SC", serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.fortune-ruler small {
+  margin-top: 0.35rem;
+  opacity: 0.7;
+  font-size: 0.62rem;
+}
+
+.fortune-ruler em {
+  margin-top: 0.55rem;
+  color: var(--cinnabar);
+  font-size: 0.68rem;
+  font-style: normal;
+}
+
+.fortune-ruler .is-selected em {
+  color: #f3c6ad;
+}
+
+.annual-commentary {
+  padding: 1.25rem;
+}
+
+.annual-commentary__title {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.annual-commentary__title svg {
+  width: 1.2rem;
+  color: var(--cinnabar);
+}
+
+.annual-commentary__title span {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+.annual-commentary__title h3 {
+  margin: 0.15rem 0 0;
+  font-family: "Noto Serif SC", serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.annual-commentary__summary {
+  margin: 0.85rem 0 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--cinnabar);
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+
+.annual-commentary__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.annual-commentary__grid section {
+  padding: 0.85rem;
+  border: 1px solid var(--line);
+  background: #fbf8f1;
+}
+
+.annual-commentary__grid h4 {
+  margin: 0;
+  color: var(--cinnabar);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.annual-commentary__grid p {
+  margin: 0.4rem 0 0;
+  color: #554e45;
+  font-size: 0.7rem;
+  line-height: 1.7;
+}
+
+.annual-evidence {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 1rem 0 0;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+.annual-evidence div {
+  padding: 0.65rem;
+  background: var(--paper);
+}
+
+.annual-evidence dt {
+  color: var(--faint);
+  font-size: 0.6rem;
+}
+
+.annual-evidence dd {
+  margin: 0.25rem 0 0;
+  font-family: "Noto Serif SC", serif;
+  font-size: 0.68rem;
+}
+
+.annual-commentary__disclaimer {
+  margin: 0.85rem 0 0;
+  color: var(--faint);
+  font-size: 0.62rem;
+  line-height: 1.6;
+}
+
 .panel-section {
   padding: 1.5rem 1.25rem;
   border-bottom: 1px solid var(--line);
@@ -1328,6 +1534,20 @@ select:focus-visible {
   .privacy-callout a {
     grid-column: 1 / -1;
     justify-content: center;
+  }
+
+  .fortune-visual__heading,
+  .annual-commentary {
+    padding: 1rem;
+  }
+
+  .fortune-ruler {
+    grid-template-columns: repeat(10, 5rem);
+  }
+
+  .annual-commentary__grid,
+  .annual-evidence {
+    grid-template-columns: 1fr;
   }
 
   .insight-sidebar {

@@ -68,6 +68,21 @@ describe("App", () => {
     );
   });
 
+  it("uses the visual decade timeline to switch the complete annual reading", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: /2027 年，虚岁/ }));
+
+    expect(screen.getByLabelText("查看日期")).toHaveValue("2027-06-20");
+    expect(
+      screen.getByRole("heading", { name: "2027 年大师批注" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /2027 年，虚岁/ }),
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("focuses and closes the algorithm dialog with the keyboard", async () => {
     const user = userEvent.setup();
     render(<App />);
