@@ -187,6 +187,7 @@ export function App() {
           />
           <ShenshaPanel
             chineseDate={chart.summary.chineseDate}
+            gender={birth.gender}
             onKeywordSelect={updateQuery}
           />
           <ClassicPanel

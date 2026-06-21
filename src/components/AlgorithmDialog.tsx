@@ -173,8 +173,8 @@ export function AlgorithmDialog({
             不同流派会得到不同星曜与运限结果，网站只负责按所选口径排盘。
           </p>
           <p className="settings-dialog__hint">
-            四柱神煞采用《三命通会》《渊海子平》所载首批 11
-            项规则，逐项显示取法与出处，不作为单独断事结论。
+            四柱神煞采用《三命通会》《渊海子平》《五行精纪》
+            可复算规则，逐项显示取法与出处，不作为单独断事结论。
           </p>
           <button className="primary-action" type="submit">
             应用并重新排盘
